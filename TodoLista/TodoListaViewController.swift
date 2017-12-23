@@ -13,6 +13,8 @@ class TodoListaViewController: UITableViewController {
     //VARAIBLES AND LETS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     var itemArray = ["Find Meimwh", "kiss her", "hit her"]
     
+    let defaults = UserDefaults.standard
+    
     //TABLE VIEW METHODS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
@@ -50,6 +52,8 @@ class TodoListaViewController: UITableViewController {
             
             self.itemArray.append(textField.text!)
             
+            self.defaults.set(self.itemArray, forKey: "TodoListaArray")
+            
             self.tableView.reloadData()
         }
         
@@ -71,7 +75,9 @@ class TodoListaViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        if let items = defaults.array(forKey: "TodoListaArray") as? [String] {
+            itemArray = items
+        }
     }
 
   
