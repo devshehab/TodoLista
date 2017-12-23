@@ -10,9 +10,10 @@ import UIKit
 
 class TodoListaViewController: UITableViewController {
 
+    //VARAIBLES AND LETS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    var itemArray = ["Find Meimwh", "kiss her", "hit her"]
     
-    let itemArray = ["Find Meimwh", "kiss her", "hit her"]
-    
+    //TABLE VIEW METHODS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
     }
@@ -26,7 +27,7 @@ class TodoListaViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark
+        
         
         if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
@@ -38,9 +39,37 @@ class TodoListaViewController: UITableViewController {
     }
     
     
+    //IBACTIONS@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        let alert = UIAlertController(title: "Add New ToDoLista Item", message: "", preferredStyle: .alert)
+        
+        var textField = UITextField()
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            
+            self.itemArray.append(textField.text!)
+            
+            self.tableView.reloadData()
+        }
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create New Item"
+            
+            textField = alertTextField
+            
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    
+    
+    //VIEW DID LOAD!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
         
     }
@@ -48,4 +77,10 @@ class TodoListaViewController: UITableViewController {
   
 
 }
+
+
+
+
+
+
 
