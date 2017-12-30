@@ -8,8 +8,8 @@
 
 import UIKit
 import RealmSwift
-
-class TodoListaViewController: UITableViewController {
+import ChameleonFramework
+class TodoListaViewController: SwipeViewController {
     
     //MARK: - VARAIBLES AND LETS
     var todoItems: Results<Item>?
@@ -30,11 +30,24 @@ class TodoListaViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         if let item = todoItems?[indexPath.row] {
             
             cell.textLabel?.text = item.title
+            
+            if let color = UIColor(hexString: selectedCategory!.colour)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
+                
+                cell.backgroundColor = color
+                
+                // for contrastic the text
+                
+                cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+                
+            cell.layer.cornerRadius = 30.0
+            }
+            
+            
             
             cell.accessoryType = item.done ? .checkmark : .none
         }
@@ -64,6 +77,13 @@ class TodoListaViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    //MARK: - Search Bar Outlet
+    
+    
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    
     
     
     //MARK: - IBACTIONS 
@@ -115,11 +135,51 @@ class TodoListaViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+     
         
         
     }
+    //MARK: - VIEW WILL APPEAR
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        title = selectedCategory?.name
+        
+        guard let colorHex = selectedCategory?.colour else { fatalError() }
+        
+        updateNavBar(withHexCode: colorHex)
+    }
+    //MARK: - View Will Disapear
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
+       updateNavBar(withHexCode: "1D9BF6")
+    }
+    
+    //MARK: - Nav Bar Setup Methods
+    
+    func updateNavBar(withHexCode colourHexCode: String) {
+        
+        guard let navBar = navigationController?.navigationBar else {fatalError("Error")}
+        
+        if let colorHex = self.selectedCategory?.colour {
+            
+            
+            if let navBarColor = UIColor(hexString: colourHexCode) {
+                
+                navBar.barTintColor = navBarColor
+                
+                navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+                
+                navBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: ContrastColorOf(navBarColor, returnFlat: true)]
+                
+                searchBar.barTintColor = navBarColor
+            }
+        }
+        
+    }
+    
+    
     //MARK: - FUNCTION
     
     
@@ -130,7 +190,22 @@ class TodoListaViewController: UITableViewController {
         tableView.reloadData()
     }
     
+    //MARK: - Delete data
     
+    override func updateModel(ar indexPath: IndexPath) {
+        if let categoryForDeletion = todoItems?[indexPath.row] {
+            
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDeletion)
+                }
+            }
+            catch {
+                print("Error deleting category, \(error)")
+            }
+            
+        }
+    }
     
 }
 //MARK: - Search Bar Methods
